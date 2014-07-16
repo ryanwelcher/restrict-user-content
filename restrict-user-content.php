@@ -9,6 +9,7 @@
  */
 
 
+
 if( !class_exists('Restrict_User_Content') ) :
 
 //get the base class
@@ -41,7 +42,9 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	/**
 	 * @var array default settings
 	 */
-	private $_default_settings = array();
+	private $_default_settings = array(
+		'additional_user_ids' => '0'
+	);
 	
 	
 	/**
@@ -86,13 +89,10 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	function mp_pre_get_posts_media_user_only( $query ) {
 
 		if(strpos( $_SERVER[ 'REQUEST_URI' ], '/wp-admin/upload.php' ) !== false ) {
-			if( is_main_query() ) {
+			if( $query->is_main_query() ) {
 				
 				if ( !current_user_can( 'update_core' ) ) {
-	            	global $current_user;
-	            	//var_dump( get_users( array( 'role' => 'subscriber', 'fields' => 'display_name') ) );
-	            	$query->set( 'author__in', array( $current_user->id, '1' ) );
-	            	//var_dump( $query );
+					$query->set( 'author__in', $this->ruc_create_list_of_user_ids() );
 	        	}
 			}
 		}
@@ -108,13 +108,15 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * Only show the posts for the current non-admin user.
 	 * 
 	 * Great function written by Sarah Gooding.
+	 * Slightly updated to use wp_get_current_user() instead of globalizing the $current_user variable
+	 * 
 	 * @link {http://premium.wpmudev.org/blog/how-to-limit-the-wordpres-posts-screen-to-only-show-authors-their-own-posts/}
 	 */
 	function ruc_parse_query_useronly( $wp_query ) {
 	    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/wp-admin/edit.php' ) !== false ) {
 	        if ( !current_user_can( 'update_core' ) ) {
-	            global $current_user;
-	            $wp_query->set( 'author', $current_user->id );
+	        	$current_user = wp_get_current_user();
+	        	$wp_query->set( 'author', $current_user->ID );
 	        }
 	    }
 	}
@@ -126,13 +128,31 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	function ruc_ajax_attachments_useronly( $query ) {
 		
 		if( !current_user_can( 'update_core' ) ) {
+			$users = $this->ruc_create_list_of_user_ids();
 
-			global $current_user;
-
-			$query['author__in'] = array( $current_user->id, '1' );
+			$query['author__in'] = array( $current_user->ID, '1' );
 		}
 
 		return $query;
+	}
+
+
+
+
+	/**
+	 * Parse the array for the user list
+	 * @return array An array of all of the allows user ID and the current user
+	 */
+	private function ruc_create_list_of_user_ids() {
+
+		$current_user = wp_get_current_user();
+
+		$settings = ( $option = get_option($this->_settings_name) ) ? $option : $this->_default_settings;
+		//create the array from the string
+		$users = explode(',', $settings['additional_user_ids'] );
+		//add the the current user id to the beginning 
+		array_unshift( $users , $current_user->ID );
+		return $users;
 	}
 
 	
@@ -184,6 +204,15 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
         'side' // Context
     	);
 
+    	//-- additional users to allow 
+    	add_meta_box(
+    		'additional_users',
+    		__('Additional Media', 'ruc'),
+    		array( &$this, 'render_additional_users_meta_box'),
+    		'settings_page_'.$this->_pagename, // Screen to which to add the meta box
+        	'normal' // Context
+    	);
+
 	}
 
 	/**
@@ -200,6 +229,18 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 			</tr>
 		</table>
 		<?php
+	}
+
+
+
+	/**
+	 * Callback for the additional_users meta box
+	 */
+	function render_additional_users_meta_box() {
+		$settings = ( $option = get_option($this->_settings_name) ) ? $option : $this->_default_settings;
+		var_dump($settings);
+
+		include plugin_dir_path( __FILE__ ) . '/_views/additional-users-meta-box.php';
 	}
 	
 	/**
