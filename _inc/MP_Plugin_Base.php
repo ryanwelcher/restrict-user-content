@@ -171,6 +171,7 @@ class MP_Plugin_Base {
 	 * Helpers
 	 */
 	
+
 	/**
 	 * Function to process custom fields
 	 * @param array Array of custom fields to process. The key is the name of the custom field

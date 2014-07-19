@@ -219,7 +219,7 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * Render the debug meta box
 	 */
 	function mp_render_debug_setting_box() {
-		$settings = ( $option = get_option($this->_settings_name) ) ? $option : $this->_default_settings;
+		$settings = $this->get_settings();
 		?>
 		<table class="form-table">
 			<tr>
@@ -237,9 +237,7 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * Callback for the additional_users meta box
 	 */
 	function render_additional_users_meta_box() {
-		$settings = ( $option = get_option($this->_settings_name) ) ? $option : $this->_default_settings;
-		var_dump($settings);
-
+		$settings = $this->get_settings();
 		include plugin_dir_path( __FILE__ ) . '/_views/additional-users-meta-box.php';
 	}
 	
@@ -270,6 +268,15 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 				printf('<div class="error"> <p> %s </p> </div>', __('Settings reset to defaults', 'ruc') );
 			}
 		}
+	}
+
+	/**
+	 * Retrieve the plugin settings
+	 * @return  array Saved settings for this plugin
+	 */
+	function get_settings( ) {
+		$settings = ( $option = get_option($this->_settings_name) ) ? $option : $this->_default_settings;
+		return $settings;
 	}
 	
 	
