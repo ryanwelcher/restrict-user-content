@@ -13,12 +13,12 @@
 if( !class_exists('Restrict_User_Content') ) :
 
 //get the base class
-if(!class_exists('MP_Plugin_Base')) {
-	require_once plugin_dir_path( __FILE__ ) . '/_inc/MP_Plugin_Base.php';
+if(!class_exists('RW_Plugin_Base')) {
+	require_once plugin_dir_path( __FILE__ ) . '/_inc/RW_Plugin_Base.php';
 }
 //get the interface
-if( !interface_exists('I_MP_Plugin_Base') ) {
-	require_once plugin_dir_path( __FILE__ ) . '/_inc/I_MP_Plugin_Base.php';
+if( !interface_exists('I_RW_Plugin_Base') ) {
+	require_once plugin_dir_path( __FILE__ ) . '/_inc/I_RW_Plugin_Base.php';
 }
 
 
@@ -26,7 +26,7 @@ if( !interface_exists('I_MP_Plugin_Base') ) {
 /**
  * Class Definition
  */
-class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
+class Restrict_User_Content extends RW_Plugin_Base implements I_RW_Plugin_Base {
 	
 	/**
 	 * @var bool Does this plugin need a settings page?
@@ -65,7 +65,7 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 		$this->_settings_menu_title = 'Restrict User Content';
 		
 		//Start your custom goodness
-		add_action('pre_get_posts', 				array( $this, 'mp_pre_get_posts_media_user_only') );
+		add_action('pre_get_posts', 				array( $this, 'ruc_pre_get_posts_media_user_only') );
 		add_filter('parse_query',					array( $this, 'ruc_parse_query_useronly'		) );
 		add_filter('ajax_query_attachments_args',	array( $this, 'ruc_ajax_attachments_useronly'		) );
 
@@ -86,7 +86,7 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * any others as indicated in the settings panel. This will allow site admins to create
 	 * a sandbox with images that are available to all users.
 	 */
-	function mp_pre_get_posts_media_user_only( $query ) {
+	function ruc_pre_get_posts_media_user_only( $query ) {
 
 		if(strpos( $_SERVER[ 'REQUEST_URI' ], '/wp-admin/upload.php' ) !== false ) {
 			if( $query->is_main_query() ) {
@@ -168,7 +168,7 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * Required by the interface - can be stubbed out if nothing is required on activation
 	 * @used-by register_activation_hook() in the parent class
 	 */
-	function mp_plugin_install() {
+	function rw_plugin_install() {
 
 		if( $this->_has_settings_page ) {
 
@@ -193,13 +193,13 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * 
 	 * @used-by add_meta_boxes_settings_page_{$this->_pagename} action  in the parent class
 	 */
-	function mp_plugin_create_meta_boxes() {
+	function rw_plugin_create_meta_boxes() {
 
 		//debug area
 		add_meta_box(
 			'debug_area', //Meta box ID
 			__('Debug', 'ruc'), //Meta box Title
-        array(&$this, 'mp_render_debug_setting_box'), //Callback defining the plugin's innards
+        array(&$this, 'rw_render_debug_setting_box'), //Callback defining the plugin's innards
         'settings_page_'.$this->_pagename, // Screen to which to add the meta box
         'side' // Context
     	);
@@ -218,7 +218,7 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	/**
 	 * Render the debug meta box
 	 */
-	function mp_render_debug_setting_box() {
+	function rw_render_debug_setting_box() {
 		$settings = $this->get_settings();
 		?>
 		<table class="form-table">
@@ -247,9 +247,9 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	 * Saves the settings 
 	 * Required by the interface 
 	 *
-	 * @used-by Custom action "mp_plugin_save_options" in the parent class
+	 * @used-by Custom action "rw_plugin_save_options" in the parent class
 	 */
-	function mp_plugin_save_settings() {
+	function rw_plugin_save_settings() {
 		//lets just make sure we can save
 		if ( !empty($_POST) && check_admin_referer( "{$this->_pagename}_save_settings", "{$this->_pagename}_settings_nonce" ) ) {
 			//save
@@ -282,9 +282,9 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 	
 	/**
 	 * Filters the name of the settings page
-	 * uses the custom filter "mp_settings_page_title"
+	 * uses the custom filter "rw_settings_page_title"
 	 */
-	function mp_settings_page_title_filter($title) {
+	function rw_settings_page_title_filter($title) {
 		return __('Restrict User Content Settings', 'ruc');
 	}
 }
