@@ -3,8 +3,8 @@
  * Base Class for Mediaplus WordPress Plugins
  */
 
-if( !class_exists('MP_Plugin_Base')):
-class MP_Plugin_Base {
+if( !class_exists('RW_Plugin_Base')):
+class RW_Plugin_Base {
 	
 	/**
 	 * @var holds the name of the file 
@@ -25,7 +25,7 @@ class MP_Plugin_Base {
 	/**
 	 * @var Settings Page Titles
 	 */
-	protected $_settings_menu_title = 'MP Plugin Title';
+	protected $_settings_menu_title = 'RW Plugin Title';
 	
 	/**
 	 * Construct
@@ -42,28 +42,28 @@ class MP_Plugin_Base {
 		
 		
 		//activation hook
-		register_activation_hook( $this->_filename, array(&$this,'mp_plugin_install') );
+		register_activation_hook( $this->_filename, array(&$this,'rw_plugin_install') );
 		
 		//do we need a settings page?
 		if( $has_settings_page ) {
 			//add the settings link on the plugin screen
-			add_filter('network_admin_plugin_action_links_'.  plugin_basename( $this->_filename ) ,  array( &$this,'mp_plugin_filter_action_links')); 
-			add_filter('plugin_action_links_' .  plugin_basename( $this->_filename )  , array(&$this,'mp_plugin_filter_action_links')); 
+			add_filter('network_admin_plugin_action_links_'.  plugin_basename( $this->_filename ) ,  array( &$this,'rw_plugin_filter_action_links')); 
+			add_filter('plugin_action_links_' .  plugin_basename( $this->_filename )  , array(&$this,'rw_plugin_filter_action_links')); 
 		
 			//create the settings page
-			add_action('admin_menu',array(&$this, 'mp_plugin_settings_page') );
+			add_action('admin_menu',array(&$this, 'rw_plugin_settings_page') );
 			
 			//add the filter to the page title
-			add_filter("{$this->_pagename}_settings_page_title", array( &$this, 'mp_settings_page_title_filter') );
+			add_filter("{$this->_pagename}_settings_page_title", array( &$this, 'rw_settings_page_title_filter') );
 			//add the action for the save setup
-			add_action("{$this->_pagename}_plugin_save_options",array( &$this, 'mp_plugin_save_settings') );
+			add_action("{$this->_pagename}_plugin_save_options",array( &$this, 'rw_plugin_save_settings') );
 			
 			//add the meta boxes to the settings panel
-			add_action('load-settings_page_'.$this->_pagename, array( &$this, 'mp_plugin_add_screen_meta_boxes' ) );
-			add_action('admin_footer-settings_page_'.$this->_pagename, array( &$this, 'mp_plugin_print_script_in_footer') );
+			add_action('load-settings_page_'.$this->_pagename, array( &$this, 'rw_plugin_add_screen_meta_boxes' ) );
+			add_action('admin_footer-settings_page_'.$this->_pagename, array( &$this, 'rw_plugin_print_script_in_footer') );
 			//make the call to create some meta boxes
-			add_action('add_meta_boxes_settings_page_'.$this->_pagename, array( &$this, 'mp_add_default_meta_boxes' ) );
-			add_action('add_meta_boxes_settings_page_'.$this->_pagename, array( &$this, 'mp_plugin_create_meta_boxes' ) );
+			add_action('add_meta_boxes_settings_page_'.$this->_pagename, array( &$this, 'rw_add_default_meta_boxes' ) );
+			add_action('add_meta_boxes_settings_page_'.$this->_pagename, array( &$this, 'rw_plugin_create_meta_boxes' ) );
 		}
 	}
 	
@@ -77,7 +77,7 @@ class MP_Plugin_Base {
 	 * @param array The links for the plugin
 	 * @return array
 	 */
-	function mp_plugin_filter_action_links($links) {
+	function rw_plugin_filter_action_links($links) {
 		$links['settings'] = sprintf( '<a href="%s"> %s </a>', admin_url( 'options-general.php?page='.$this->_pagename ), __( 'Settings', 'plugin_domain' ) );
 		return $links;
 	}
@@ -92,14 +92,14 @@ class MP_Plugin_Base {
 	 * The callback function is in the Interface and should will be defined in the child class
 	 *
 	 */
-	function mp_plugin_settings_page() {
+	function rw_plugin_settings_page() {
 		
 		add_options_page(
 			sprintf( __('%s', $this->_text_domain), $this->_settings_menu_title ),
 			sprintf( __('%s', $this->_text_domain), $this->_settings_menu_title ),
 			'manage_options',
 			$this->_pagename,
-			array( &$this, 'mp_plugin_render_settings_page')
+			array( &$this, 'rw_plugin_render_settings_page')
 		);
 	}
 	
@@ -108,14 +108,14 @@ class MP_Plugin_Base {
 	 * 
 	 * The settings page is more of a framework, it can be overridden but there is not much point
 	 */
-	function mp_plugin_render_settings_page(){
+	function rw_plugin_render_settings_page(){
 		include plugin_dir_path( $this->_filename ) .'_views/view-settings-page.php';
 	}
 	
 	/**
 	 * Settings Page Meta Boxes
 	 */
-	function mp_plugin_add_screen_meta_boxes() {
+	function rw_plugin_add_screen_meta_boxes() {
 		/* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
 		do_action('add_meta_boxes_settings_page_'.$this->_pagename, null);
     	do_action('add_meta_boxes', 'settings_page_'.$this->_pagename, null);
@@ -130,7 +130,7 @@ class MP_Plugin_Base {
 	/**
 	 * Adds the javascript for the meta boxes
 	 */
-	function mp_plugin_print_script_in_footer() {
+	function rw_plugin_print_script_in_footer() {
 		 ?>
     <script>jQuery(document).ready(function(){ postboxes.add_postbox_toggles(pagenow);});</script>
     <?php
@@ -139,11 +139,11 @@ class MP_Plugin_Base {
 	/**
 	 * Create a default save settings box
 	 */
-	function mp_add_default_meta_boxes() {
+	function rw_add_default_meta_boxes() {
 		add_meta_box(
 			'save_settings', //Meta box ID
 			__('Save Settings',$this->_text_domain), //Meta box Title
-        array(&$this, 'mp_render_save_setting_box'), //Callback defining the plugin's innards
+        array(&$this, 'rw_render_save_setting_box'), //Callback defining the plugin's innards
         'settings_page_'.$this->_pagename, // Screen to which to add the meta box
         'side' // Context
     	);
@@ -152,7 +152,7 @@ class MP_Plugin_Base {
 	/**
 	 * Render the save settings box
 	 */
-	function mp_render_save_setting_box() {
+	function rw_render_save_setting_box() {
 		?>
       <table class="form-table">
       <tr>
@@ -178,7 +178,7 @@ class MP_Plugin_Base {
 	 * @param int Post Id to add the fields to 
 	 * @todo add some error messaging when in dev_mode
 	 */
-	protected function mp_process_custom_fields($post_id, $custom_post_meta) {
+	protected function rw_process_custom_fields($post_id, $custom_post_meta) {
 		//check for the array so we don't break the loop
 		if( $custom_post_meta ) {
 			//save each item as a custom field
