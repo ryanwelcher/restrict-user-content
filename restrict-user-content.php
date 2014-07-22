@@ -8,8 +8,6 @@
  * Text Domain: ruc
  */
 
-
-
 if( !class_exists('Restrict_User_Content') ) :
 
 //get the base class
@@ -174,11 +172,17 @@ class Restrict_User_Content extends MP_Plugin_Base implements I_MP_Plugin_Base {
 
 			//look for the settings
 			$settings = get_option($this->_settings_name);
+
 			if(!$settings) {
 				add_option( $this->_settings_name, $this->_default_settings );
 			}else{
-				$old_settings = get_option( $this->_settings_name );
-				$updated_settings = wp_parse_args( $_POST[$this->_settings_name], $this->_default_settings );
+
+				if( isset( $_POST[$this->_settings_name] ) ) {
+					$updated_settings = wp_parse_args( $_POST[$this->_settings_name], $this->_default_settings );
+				}else{
+					$updated_settings = get_option( $this->_settings_name );
+				}
+				
 				update_option( $this->_settings_name, $updated_settings );
 			}
 		}
