@@ -3,8 +3,8 @@
  * Plugin Name: Restrict User Content
  * Description: Limits the Posts/Media pages to only show content created by the logged in user. 
  * Author: Ryan Welcher
- * Version: 1.0
- * Author URI: http://www.mediaplusadvertising.com
+ * Version: 1.0.1
+ * Author URI: http://www.ryanwelcher.com
  * Text Domain: ruc
  */
 
