@@ -31,7 +31,7 @@ This plugin was inspired by an article by [Sarah Gooding](http://premium.wpmudev
 
 = Why would I want to give users access to other users media? =
 
-This would allow you to create set of standard or default media avaiable to all users. In the case where users are creating content and don't have an image, they can choose one from the "Media Pool".
+This would allow you to create set of standard or default media available to all users. In the case where users are creating content and don't have an image, they can choose one from the "Media Pool".
 
 = Why create a new user just for media? =
 
