@@ -3,8 +3,8 @@ Contributors: welcher
 Donate link: http://www.ryanwelcher.com/donate/
 Tags: users, media, posts, pages, admin
 Requires at least: 3.5
-Tested up to: 3.9.1
-Stable tag: 1.0.1
+Tested up to: 4.1
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,3 +48,11 @@ You can use the above to your advantage by creating example content for users an
 = 1.0.1 =
 * bug fix for undefined variable on re-activation because I'm a hack.
 * added proper cleanup if plugin is deleted - don't know why you'd want to do something like that, but there it is.
+
+= 1.0.2 =
+* minor fixes for the Media Library limitation
+
+= 1.0.3 =
+
+* minor cleanup and fix
+
