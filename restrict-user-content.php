@@ -192,7 +192,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 					'debug_area', //Meta box ID
 					__( 'Debug', 'ruc' ), //Meta box Title
 					array( &$this, 'rw_render_debug_setting_box' ), //Callback defining the plugin's innards
-					'settings_page_'.$this->_pagename, // Screen to which to add the meta box
+					'settings_page_' . $this->_pagename, // Screen to which to add the meta box
 					'side' // Context
 				);
 			}
@@ -203,7 +203,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 				'additional_users',
 				__( 'Additional Media', 'ruc' ),
 				array( &$this, 'render_additional_users_meta_box' ),
-				'settings_page_'.$this->_pagename, // Screen to which to add the meta box
+				'settings_page_' . $this->_pagename, // Screen to which to add the meta box
 				'normal' // Context
 			);
 

@@ -152,7 +152,7 @@ if ( ! class_exists( 'RW_Plugin_Base' ) ):
 		 */
 		function rw_render_save_setting_box() {
 			?>
-			<table class="form-table">
+			<table>
 				<tr>
 					<td>
 						<input id="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save Changes', $this->_text_domain );?>" name="submit">

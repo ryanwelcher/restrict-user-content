@@ -12,11 +12,7 @@
         <div id="poststuff">
  
             <div id="post-body" class="metabox-holder columns-<?php echo 1 == get_current_screen()->get_columns() ? '1' : '2'; ?>">
- 
-                <div id="post-body-content">
-                    <!-- #post-body-content -->
-                </div>
- 
+
                 <div id="postbox-container-1" class="postbox-container">
                     <?php do_meta_boxes('','side',null); ?>
                 </div>
