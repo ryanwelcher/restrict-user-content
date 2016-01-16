@@ -14,17 +14,14 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 	if ( ! class_exists( 'RW_Plugin_Base' ) ) {
 		require_once plugin_dir_path( __FILE__ ) . '/_inc/RW_Plugin_Base.php';
 	}
-	// Get the interface.
-	if ( ! interface_exists( 'I_RW_Plugin_Base' ) ) {
-		require_once plugin_dir_path( __FILE__ ) . '/_inc/I_RW_Plugin_Base.php';
-	}
+
 
 
 
 	/**
 	 * Class Definition
 	 */
-	class Restrict_User_Content extends RW_Plugin_Base implements I_RW_Plugin_Base {
+	class Restrict_User_Content extends RW_Plugin_Base {
 
 		/**
 		 * @var bool Does this plugin need a settings page?
@@ -57,7 +54,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		function __construct() {
 
 			//call super class constructor
-			parent::__construct( __FILE__, $this->_has_settings_page, $this->_settings_page_name );
+			parent::__construct( __FILE__, $this->_settings_page_name );
 
 			//set some details
 			$this->_settings_menu_title = 'Restrict User Content';
@@ -66,6 +63,8 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 			add_action( 'pre_get_posts', 				array( $this, 'ruc_pre_get_posts_media_user_only' ) );
 			add_filter( 'parse_query',					array( $this, 'ruc_parse_query_useronly' ) );
 			add_filter( 'ajax_query_attachments_args',	array( $this, 'ruc_ajax_attachments_useronly' ) );
+			add_filter( 'views_edit-post',              array( $this, 'ruc_remove_other_users_posts' ) );
+			add_filter( 'views_edit-page',              array( $this, 'ruc_remove_other_users_posts' ) );
 
 
 
@@ -152,6 +151,25 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		}
 
 
+		/**
+		 * If we're not an admin, we only want to see the Mine count for posts
+		 *
+		 * @param $views array The list of post counts for each status type
+		 *
+		 * @return mixed
+		 */
+		public function ruc_remove_other_users_posts( $views ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				foreach ( $views as $key => $data ) {
+					if ( 'mine' !== $key ) {
+						unset( $views[ $key ] );
+					}
+				}
+			}
+			return $views;
+		}
+
+
 
 
 
@@ -165,25 +183,22 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		 * @used-by register_activation_hook() in the parent class
 		 */
 		function rw_plugin_install() {
+			//look for the settings
+			$settings = get_option( $this->_settings_name );
 
-			if ( $this->_has_settings_page ) {
+			if ( ! $settings ) {
+				add_option( $this->_settings_name, $this->_default_settings );
+			} else {
 
-				//look for the settings
-				$settings = get_option( $this->_settings_name );
-
-				if ( ! $settings ) {
-					add_option( $this->_settings_name, $this->_default_settings );
+				if ( isset( $_POST[ $this->_settings_name ] ) ) {
+					$updated_settings = wp_parse_args( $_POST[ $this->_settings_name ], $this->_default_settings );
 				} else {
-
-					if ( isset( $_POST[ $this->_settings_name ] ) ) {
-						$updated_settings = wp_parse_args( $_POST[ $this->_settings_name ], $this->_default_settings );
-					} else {
-						$updated_settings = get_option( $this->_settings_name );
-					}
-
-					update_option( $this->_settings_name, $updated_settings );
+					$updated_settings = get_option( $this->_settings_name );
 				}
+
+				update_option( $this->_settings_name, $updated_settings );
 			}
+
 		}
 
 
@@ -250,7 +265,6 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		 * Method to save the  settings
 		 *
 		 * Saves the settings
-		 * Required by the interface
 		 *
 		 * @used-by Custom action "rw_plugin_save_options" in the parent class
 		 */
@@ -258,7 +272,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 			// Lets just make sure we can save.
 			if ( ! empty( $_POST ) && check_admin_referer( "{$this->_pagename}_save_settings", "{$this->_pagename}_settings_nonce" ) ) {
 				// Save.
-				if ( isset( $_POST['submit'] ) ) {
+				if ( isset( $_POST['submit'] ) && current_user_can( 'manage_options' ) ) {
 					//status message
 					$old_settings = get_option( $this->_settings_name );
 					$updated_settings = wp_parse_args( $_POST[ $this->_settings_name ], $old_settings );
@@ -267,7 +281,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 				}
 
 				// Reset.
-				if ( isset( $_POST['reset'] ) ) {
+				if ( isset( $_POST['reset'] ) && current_user_can( 'manage_options' ) ) {
 					//status message
 					update_option( $this->_settings_name, $this->_default_settings );
 					printf( '<div class="error"><p>%s</p></div>', esc_html__( 'Settings reset to defaults', 'ruc' ) );
@@ -282,15 +296,6 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		function get_settings() {
 			$settings = ( $option = get_option( $this->_settings_name ) ) ? $option : $this->_default_settings;
 			return $settings;
-		}
-
-
-		/**
-		 * Filters the name of the settings page
-		 * uses the custom filter "rw_settings_page_title"
-		 */
-		function rw_settings_page_title_filter( $title ) {
-			return esc_html__( 'Restrict User Content Settings', 'ruc' );
 		}
 	}
 
