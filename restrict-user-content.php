@@ -54,7 +54,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		function __construct() {
 
 			//call super class constructor
-			parent::__construct( __FILE__, $this->_has_settings_page, $this->_settings_page_name );
+			parent::__construct( __FILE__, $this->_settings_page_name );
 
 			//set some details
 			$this->_settings_menu_title = 'Restrict User Content';
@@ -163,7 +163,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		 */
 		function rw_plugin_install() {
 
-			if ( $this->_has_settings_page ) {
+			//if ( $this->_has_settings_page ) {
 
 				//look for the settings
 				$settings = get_option( $this->_settings_name );
@@ -180,7 +180,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 
 					update_option( $this->_settings_name, $updated_settings );
 				}
-			}
+			//}
 		}
 
 
@@ -279,15 +279,6 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		function get_settings() {
 			$settings = ( $option = get_option( $this->_settings_name ) ) ? $option : $this->_default_settings;
 			return $settings;
-		}
-
-
-		/**
-		 * Filters the name of the settings page
-		 * uses the custom filter "rw_settings_page_title"
-		 */
-		function rw_settings_page_title_filter( $title ) {
-			return esc_html__( 'Restrict User Content Settings', 'ruc' );
 		}
 	}
 
