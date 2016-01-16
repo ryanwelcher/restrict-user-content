@@ -162,25 +162,22 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		 * @used-by register_activation_hook() in the parent class
 		 */
 		function rw_plugin_install() {
+			//look for the settings
+			$settings = get_option( $this->_settings_name );
 
-			//if ( $this->_has_settings_page ) {
+			if ( ! $settings ) {
+				add_option( $this->_settings_name, $this->_default_settings );
+			} else {
 
-				//look for the settings
-				$settings = get_option( $this->_settings_name );
-
-				if ( ! $settings ) {
-					add_option( $this->_settings_name, $this->_default_settings );
+				if ( isset( $_POST[ $this->_settings_name ] ) ) {
+					$updated_settings = wp_parse_args( $_POST[ $this->_settings_name ], $this->_default_settings );
 				} else {
-
-					if ( isset( $_POST[ $this->_settings_name ] ) ) {
-						$updated_settings = wp_parse_args( $_POST[ $this->_settings_name ], $this->_default_settings );
-					} else {
-						$updated_settings = get_option( $this->_settings_name );
-					}
-
-					update_option( $this->_settings_name, $updated_settings );
+					$updated_settings = get_option( $this->_settings_name );
 				}
-			//}
+
+				update_option( $this->_settings_name, $updated_settings );
+			}
+
 		}
 
 
@@ -247,7 +244,6 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 		 * Method to save the  settings
 		 *
 		 * Saves the settings
-		 * Required by the interface
 		 *
 		 * @used-by Custom action "rw_plugin_save_options" in the parent class
 		 */
@@ -255,7 +251,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 			// Lets just make sure we can save.
 			if ( ! empty( $_POST ) && check_admin_referer( "{$this->_pagename}_save_settings", "{$this->_pagename}_settings_nonce" ) ) {
 				// Save.
-				if ( isset( $_POST['submit'] ) ) {
+				if ( isset( $_POST['submit'] ) && current_user_can( 'manage_options' ) ) {
 					//status message
 					$old_settings = get_option( $this->_settings_name );
 					$updated_settings = wp_parse_args( $_POST[ $this->_settings_name ], $old_settings );
@@ -264,7 +260,7 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 				}
 
 				// Reset.
-				if ( isset( $_POST['reset'] ) ) {
+				if ( isset( $_POST['reset'] ) && current_user_can( 'manage_options' ) ) {
 					//status message
 					update_option( $this->_settings_name, $this->_default_settings );
 					printf( '<div class="error"><p>%s</p></div>', esc_html__( 'Settings reset to defaults', 'ruc' ) );
