@@ -63,6 +63,8 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 			add_action( 'pre_get_posts', 				array( $this, 'ruc_pre_get_posts_media_user_only' ) );
 			add_filter( 'parse_query',					array( $this, 'ruc_parse_query_useronly' ) );
 			add_filter( 'ajax_query_attachments_args',	array( $this, 'ruc_ajax_attachments_useronly' ) );
+			add_filter( 'views_edit-post',              array( $this, 'ruc_remove_other_users_posts' ) );
+			add_filter( 'views_edit-page',              array( $this, 'ruc_remove_other_users_posts' ) );
 
 
 
@@ -146,6 +148,25 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 			//add the the current user id to the beginning
 			array_unshift( $users , $current_user->ID );
 			return $users;
+		}
+
+
+		/**
+		 * If we're not an admin, we only want to see the Mine count for posts
+		 *
+		 * @param $views array The list of post counts for each status type
+		 *
+		 * @return mixed
+		 */
+		public function ruc_remove_other_users_posts( $views ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				foreach ( $views as $key => $data ) {
+					if ( 'mine' !== $key ) {
+						unset( $views[ $key ] );
+					}
+				}
+			}
+			return $views;
 		}
 
 
