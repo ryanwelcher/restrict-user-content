@@ -14,17 +14,14 @@ if ( ! class_exists( 'Restrict_User_Content' ) ) :
 	if ( ! class_exists( 'RW_Plugin_Base' ) ) {
 		require_once plugin_dir_path( __FILE__ ) . '/_inc/RW_Plugin_Base.php';
 	}
-	// Get the interface.
-	if ( ! interface_exists( 'I_RW_Plugin_Base' ) ) {
-		require_once plugin_dir_path( __FILE__ ) . '/_inc/I_RW_Plugin_Base.php';
-	}
+
 
 
 
 	/**
 	 * Class Definition
 	 */
-	class Restrict_User_Content extends RW_Plugin_Base implements I_RW_Plugin_Base {
+	class Restrict_User_Content extends RW_Plugin_Base {
 
 		/**
 		 * @var bool Does this plugin need a settings page?
