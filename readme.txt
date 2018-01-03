@@ -3,7 +3,7 @@ Contributors: welcher
 Donate link: http://www.ryanwelcher.com/donate/
 Tags: users, media, posts, pages, admin
 Requires at least: 3.5
-Tested up to: 4.4.1
+Tested up to: 4.9.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -59,5 +59,5 @@ You can use the above to your advantage by creating example content for users an
 = 2.0 =
 * cleanup of code base
 * security fixes
-* Only showing the Mine count for posts/pages - thanks for the suggestion drbellerive!
+* Only showing the Mine count for posts/pages - thanks for the suggestion @drbellerive!
 
